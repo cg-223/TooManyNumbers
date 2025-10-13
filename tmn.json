@@ -1,0 +1,16 @@
+{
+	"id": "toomanynumbers",
+	"name": "Too Many Numbers",
+	"display_name": "Too Many Numbers",
+	"author": [
+		"cg", "Mathguy24"
+	],
+	"description": "Adds seamless support for large numbers.",
+	"prefix": "tmj",
+	"main_file": "tmn.lua",
+	"priority": 0,
+	"badge_colour": "FFFFFF",
+	"badge_text_colour": "FFFFFF",
+	"allow_redistribution": true,
+	"version": "0.0.1"
+}
