@@ -1,6 +1,6 @@
 # Unfinished
 
-TMN doenst currently work as Talisman does.
+TMN doesn't currently work as Talisman does.
 
 # Too Many Numbers
 This mod succeeds *Talisman* as the goto mod for numbers above 1e308.
