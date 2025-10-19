@@ -6,7 +6,7 @@
 		"cg", "Mathguy24"
 	],
 	"description": "Adds seamless support for large numbers.",
-	"prefix": "tmj",
+	"prefix": "tmn",
 	"main_file": "tmn.lua",
 	"priority": 0,
 	"badge_colour": "FFFFFF",
