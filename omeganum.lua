@@ -9,7 +9,7 @@ local OMEGA_ID = 1
 
 local Big = {}
 
-local OmegaMeta = {}
+OmegaMeta = {}
 OmegaMeta.__index = function(self, ind)
     if ind == "array" or ind == "sign" then
         return OMEGA_LIST[self.pos_in_arr][ind]
@@ -22,13 +22,13 @@ OmegaMeta.__newindex = function(self, ind, val)
 end
 
 
-local COmega = ffi.metatype(OmegaCType, OmegaMeta)
+COmega = ffi.metatype(OmegaCType, OmegaMeta)
 
 local MAX_SAFE_INTEGER = 9007199254740991
 local MAX_E = math.log(MAX_SAFE_INTEGER, 10)
 local LONG_STRING_MIN_LENGTH = 17
  
-local R = {}
+R = {}
 
 R.ZERO = 0
 R.ONE = 1
@@ -51,7 +51,7 @@ R.EE_MAX_SAFE_INTEGER="ee"..tostring(R.MAX_SAFE_INTEGER)
 R.TETRATED_MAX_SAFE_INTEGER="10^^"..tostring(R.MAX_SAFE_INTEGER)
 
 -- this will be populated with bignum equivalents of R's values at the end of the file
-local B = {}
+B = {}
 
 --------------make the numbers look good----------------------
 function thousands_format(number)
@@ -590,6 +590,16 @@ function Big:to_number()
         return math.pow(10,self.array[1]);
     end
     return self.array[1];
+end
+
+function Big:to_number_lease()
+    local ret = self:to_number()
+    if ret == R.POSITIVE_INFINITY then
+        return 1e308
+    elseif ret == R.NEGATIVE_INFINITY then
+        return -1e308
+    end
+    return ret
 end
 
 function Big:floor()
@@ -1400,47 +1410,47 @@ end
 
 function OmegaMeta.__add(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):add(b2)
+        return Big:create(b1):add(b2):to_number_lease()
     end
-    return b1:add(b2)
+    return b1:add(b2):to_number_lease()
 end
 
 function OmegaMeta.__sub(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):sub(b2)
+        return Big:create(b1):sub(b2):to_number_lease()
     end
-    return b1:sub(b2)
+    return b1:sub(b2):to_number_lease()
 end
 
 function OmegaMeta.__mul(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):mul(b2)
+        return Big:create(b1):mul(b2):to_number_lease()
     end
-    return b1:mul(b2)
+    return b1:mul(b2):to_number_lease()
 end
 
 function OmegaMeta.__div(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):div(b2)
+        return Big:create(b1):div(b2):to_number_lease()
     end
-    return b1:div(b2)
+    return b1:div(b2):to_number_lease()
 end
 function OmegaMeta.__mod(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):mod(b2)
+        return Big:create(b1):mod(b2):to_number_lease()
     end
-    return b1:mod(b2)
+    return b1:mod(b2):to_number_lease()
 end
 
 function OmegaMeta.__unm(b)
-    return b:neg()
+    return b:neg():to_number_lease()
 end
 
 function OmegaMeta.__pow(b1, b2)
     if type(b1) == "number" then
-        return Big:ensureBig(b1):pow(b2)
+        return Big:ensureBig(b1):pow(b2):to_number_lease()
     end
-    return b1:pow(b2)
+    return b1:pow(b2):to_number_lease()
 end
 
 function OmegaMeta.__le(b1, b2)
