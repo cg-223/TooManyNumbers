@@ -592,6 +592,19 @@ function Big:to_number()
     return self.array[1];
 end
 
+function Big:number_unless_scoring()
+    if G.TMN_SCORING then
+        return self
+    end
+    local ret = self:to_number()
+    if ret == R.POSITIVE_INFINITY then
+        return 1e308
+    elseif ret == R.NEGATIVE_INFINITY then
+        return -1e308
+    end
+    return ret
+end
+
 function Big:to_number_lease()
     local ret = self:to_number()
     if ret == R.POSITIVE_INFINITY then
@@ -1410,47 +1423,47 @@ end
 
 function OmegaMeta.__add(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):add(b2):to_number_lease()
+        return Big:create(b1):add(b2):number_unless_scoring()
     end
-    return b1:add(b2):to_number_lease()
+    return b1:add(b2):number_unless_scoring()
 end
 
 function OmegaMeta.__sub(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):sub(b2):to_number_lease()
+        return Big:create(b1):sub(b2):number_unless_scoring()
     end
-    return b1:sub(b2):to_number_lease()
+    return b1:sub(b2):number_unless_scoring()
 end
 
 function OmegaMeta.__mul(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):mul(b2):to_number_lease()
+        return Big:create(b1):mul(b2):number_unless_scoring()
     end
-    return b1:mul(b2):to_number_lease()
+    return b1:mul(b2):number_unless_scoring()
 end
 
 function OmegaMeta.__div(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):div(b2):to_number_lease()
+        return Big:create(b1):div(b2):number_unless_scoring()
     end
-    return b1:div(b2):to_number_lease()
+    return b1:div(b2):number_unless_scoring()
 end
 function OmegaMeta.__mod(b1, b2)
     if type(b1) == "number" then
-        return Big:create(b1):mod(b2):to_number_lease()
+        return Big:create(b1):mod(b2):number_unless_scoring()
     end
-    return b1:mod(b2):to_number_lease()
+    return b1:mod(b2):number_unless_scoring()
 end
 
 function OmegaMeta.__unm(b)
-    return b:neg():to_number_lease()
+    return b:neg():number_unless_scoring()
 end
 
 function OmegaMeta.__pow(b1, b2)
     if type(b1) == "number" then
-        return Big:ensureBig(b1):pow(b2):to_number_lease()
+        return Big:ensureBig(b1):pow(b2):number_unless_scoring()
     end
-    return b1:pow(b2):to_number_lease()
+    return b1:pow(b2):number_unless_scoring()
 end
 
 function OmegaMeta.__le(b1, b2)
@@ -1479,7 +1492,7 @@ function OmegaMeta.__eq(b1, b2)
 end
 
 function OmegaMeta.__tostring(b)
-    return tostring(b:to_number()) -- TODO: add actual number formatting
+    return number_format(b)
 end
 
 function OmegaMeta.__concat(a, b)

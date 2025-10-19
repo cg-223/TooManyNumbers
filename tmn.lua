@@ -1,7 +1,7 @@
 TMN = SMODS.current_mod
 
 Omega = assert(SMODS.load_file("omeganum.lua"))()
-
+Formatter = assert(SMODS.load_file("format.lua"))()
 function descendants(tbl, ret)
     ret = ret or {}
     for i, v in pairs(tbl) do
@@ -76,7 +76,7 @@ local function deep_replace(tbl, seen)
     seen = seen or {}
     for i, v in pairs(tbl) do
         if type(v) == "cdata" then
-            new[i] = v:to_number()
+            new[i] = v:to_number_lease()
         elseif type(v) == "table" then
             if seen[v] then
                 tbl[i] = seen[v]
@@ -88,20 +88,41 @@ local function deep_replace(tbl, seen)
     return new
 end
 
+local nf = number_format
+function number_format(num, e_switch_point)
+    if type(num) == 'cdata' then
+        if num.str then return num.str end
+        if num:arraySize() > 2 then
+            local str = Formatter:format(num, 3)
+            num.str = str
+            return str
+        end
+        G.E_SWITCH_POINT = G.E_SWITCH_POINT or 100000000000
+        if (num or 0) < (to_big(G.E_SWITCH_POINT) or 0) then
+            return nf(num:to_number(), e_switch_point)
+        else
+            return Formatter:format(num, 3)
+        end
+    else
+        return nf(num, e_switch_point)
+    end
+end
+
 local old = getmetatable(G.SAVE_MANAGER.channel).push
 getmetatable(G.SAVE_MANAGER.channel).push = function(self, val)
     if type(val) == "table" then
+        -- sorry guys cloning > sharing
         val = deep_replace(val)
     end
     return old(self, val)
 end
 
 local old = tonumber
-function tonumber(num)
+function tonumber(num, base)
     if getmetatable(num) == OmegaMeta then
         return num:to_number()
     end
-    return old(num)
+    return old(num, base)
 end
 
 for i, v in pairs(math) do
@@ -109,7 +130,8 @@ for i, v in pairs(math) do
         math[i] = function(...)
             local args = { ... }
             local i = 1
-            while i <= #args do
+            local len = #args
+            while i <= len do
                 local v = args[i]
                 if type(v) == "cdata" then
                     args[i] = v:to_number_lease()
@@ -120,3 +142,39 @@ for i, v in pairs(math) do
         end
     end
 end
+
+local old = G.FUNCS.evaluate_play
+function G.FUNCS.evaluate_play(...)
+    G.TMN_SCORING = true
+    local ret = old(...)
+    G.TMN_SCORING = false
+    return ret
+end
+
+local old = mod_mult
+function mod_mult(mul)
+    return to_big(old(mul))
+end
+
+local old = mod_chips
+function mod_chips(chips)
+    return to_big(old(chips))
+end
+
+SMODS.Joker {
+    key = "urmom",
+    loc_txt = {
+        name = "numberslop",
+        text = { "^2 mult" }
+    },
+    calculate = function(self, card, context)
+        if context.joker_main then
+            print(type(mult), type(mult ^ 2))
+            mult = mod_mult(mult ^ 2)
+            return {
+                message = "^2 Mult!",
+                colour = G.C.RED
+            }
+        end
+    end
+}
