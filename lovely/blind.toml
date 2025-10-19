@@ -1,0 +1,12 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -10
+
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''    if ante <= 8 then return amounts[ante] end'''
+position = "before"
+payload = '''if type(ante) == "cdata" then ante = ante:to_number() end'''
+match_indent = true
